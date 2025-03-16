@@ -1,8 +1,30 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
+from strawberry.fastapi import GraphQLRouter
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+from api.schema import schema
+from mock_spotify_rest_api_client.client import Client
 
 
-@app.get("/")
-async def hello_world():
-    return {"message": "Hello World"}
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with Client(
+        base_url="https://spotify-demo-api-fe224840a08c.herokuapp.com/v1"
+    ) as spotify_client:
+        yield {"spotify_client": spotify_client}
+        
+
+app = FastAPI(lifespan=lifespan)
+
+graphql_router = GraphQLRouter(schema, path="/", graphql_ide="apollo-sandbox")
+
+
+app.include_router(graphql_router)
+
+
+
+@app.get("/health")
+async def health_check():
+    return {"message": "Status OK"}

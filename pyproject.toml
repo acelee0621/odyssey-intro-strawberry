@@ -4,6 +4,12 @@ description = ""
 name = "api"
 requires-python = ">=3.7"
 version = "0.1.0"
+dependencies = [
+    "attrs>=24.2.0",
+    "fastapi[standard]>=0.103.2",
+    "httpx>=0.24.1",
+    "strawberry-graphql>=0.196.2",
+]
 
 [tool.black]
 line-length = 88
